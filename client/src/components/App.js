@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import Navbar from './Navbar'
 import Dashboard from './Dashboard'
 import AddEmployeeModal from './AddEmplyeeModal'
 
@@ -57,7 +56,6 @@ export default class App extends Component {
   render = () => {
     return (
       <div>
-        <Navbar />
         <Dashboard
           employees={this.state.employees}
           editBtnClick={this.handleEditBtnClick}
