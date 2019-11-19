@@ -1,0 +1,26 @@
+{
+  "name": "manager",
+  "version": "1.0.0",
+  "description": "An application which is used to manage the employee of an organization.",
+  "main": "server/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamanishagarwal/manager.git"
+  },
+  "author": "Anish Agarwal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/iamanishagarwal/manager/issues"
+  },
+  "homepage": "https://github.com/iamanishagarwal/manager#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "mongoose": "^5.7.11"
+  },
+  "devDependencies": {
+    "prettier": "^1.19.1"
+  }
+}
