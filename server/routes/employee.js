@@ -36,8 +36,8 @@ router.put('/:id', async (req, res) => {
     res.send('Something went wrong')
   }
 
-  const { error } = validate(req.body)
-  if (error) return res.status(400).send(error.details[0].message)
+  const { error } = validate({ name, gender, age, designation, department, joiningDate, available })
+  if (error) return res.send(error.details[0].message)
 
   await Employee.updateOne(
     { _id: req.params.id },
