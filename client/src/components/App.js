@@ -19,15 +19,24 @@ export default class App extends Component {
         available: true
       },
       modal: 'add',
-      editEmployeeIndex: null
+      editEmployeeIndex: null,
+      availableEmp: 0
     }
+  }
+
+  calculateAvailableEmp = employees => {
+    let count = 0
+    employees.forEach(emp => {
+      if (emp.available === true) count++
+    })
+    return count
   }
 
   componentDidMount = async () => {
     let employees = await axios.get('/api/employee')
     employees = employees.data
-    console.log(employees)
-    this.setState({ employees })
+    const availableEmp = this.calculateAvailableEmp(employees)
+    this.setState({ employees, availableEmp })
   }
 
   addModalSubmit = employees => {
@@ -38,7 +47,7 @@ export default class App extends Component {
     this.setState({
       editEmployee: {
         name: '',
-        gender: '',
+        gender: 'Select',
         age: '',
         designation: '',
         department: '',
@@ -50,7 +59,6 @@ export default class App extends Component {
   }
 
   handleEditBtnClick = (emp, index) => {
-    console.log(emp, index)
     this.setState({ editEmployee: emp, modal: 'edit', editEmployeeIndex: index })
   }
 
@@ -60,13 +68,27 @@ export default class App extends Component {
     this.setState({ editEmployee: employee })
   }
 
+  handleDeleteBtn = async id => {
+    await axios.delete(`/api/employee/${id}`)
+    this.componentDidMount()
+  }
+
+  handleCheckBox = async emp => {
+    emp.available = !emp.available
+    await axios.put(`/api/employee/${emp._id}`, emp)
+    this.componentDidMount()
+  }
+
   render = () => {
     return (
       <div>
         <Dashboard
           employees={this.state.employees}
+          availableEmp={this.state.availableEmp}
           editBtnClick={this.handleEditBtnClick}
           addBtnClick={this.handleAddBtnClick}
+          deleteBtnClick={this.handleDeleteBtn}
+          checkBoxClick={this.handleCheckBox}
         />
         <AddEmployeeModal
           submit={this.addModalSubmit}

@@ -16,15 +16,13 @@ export default class Dashboard extends Component {
   }
 
   static getDerivedStateFromProps(props, state) {
-    if (JSON.stringify(props.employees) !== JSON.stringify(state.employees) && props.employees.length > 0) {
-      let count = 0
-      props.employees.forEach(emp => {
-        if (emp.available === true) count++
-      })
-
+    if (
+      JSON.stringify(props.employees) !== JSON.stringify(state.employees) ||
+      props.availableEmp !== state.availableEmp
+    ) {
       return {
         employees: props.employees,
-        availableEmp: count
+        availableEmp: props.availableEmp
       }
     }
     return null
@@ -37,23 +35,8 @@ export default class Dashboard extends Component {
     this.setState({ employees, availableEmp })
   }
 
-  handleCheckBox = async emp => {
-    console.log(emp._id)
-    emp.available = !emp.available
-    await axios.put(`/api/employee/${emp._id}`, emp)
-    this.componentDidMount()
-  }
-
-  handleDeleteBtn = async id => {
-    let results = await axios.delete(`/api/employee/${id}`)
-    results = results.data
-    console.log(results)
-    this.componentDidMount()
-  }
-
   renderEmployees = () => {
     let results = this.state.employees
-    console.log(results)
     if (results.length === 0) return null
     else {
       results = results.map(emp => {
@@ -68,7 +51,7 @@ export default class Dashboard extends Component {
                   className="custom-control-input"
                   id={emp._id}
                   checked={emp.available}
-                  onChange={e => this.handleCheckBox(emp)}
+                  onChange={() => this.props.checkBoxClick(emp)}
                 />
                 <label className="custom-control-label" htmlFor={emp._id}></label>
               </div>
@@ -80,7 +63,6 @@ export default class Dashboard extends Component {
                 data-toggle="modal"
                 data-target="#addEmployeeModal"
                 onClick={() => {
-                  console.log(emp._id)
                   this.props.editBtnClick(emp, emp._id)
                 }}
               >
@@ -89,10 +71,7 @@ export default class Dashboard extends Component {
               <button
                 type="button"
                 className="btn btn-outline-danger btn-sm"
-                onClick={e => {
-                  e.preventDefault()
-                  this.handleDeleteBtn(emp._id)
-                }}
+                onClick={() => this.props.deleteBtnClick(emp._id)}
               >
                 <i className="fa fa-trash"></i>&nbsp; Delete
               </button>
@@ -105,7 +84,6 @@ export default class Dashboard extends Component {
   }
 
   render = () => {
-    console.log(this.state)
     return (
       <div>
         <div className="container-fluid">
