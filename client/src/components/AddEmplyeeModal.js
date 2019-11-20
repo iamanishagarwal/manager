@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 
 export default class AddEmplyeeModal extends Component {
   state = { employee: {}, modal: 'add', index: null }
@@ -19,18 +20,17 @@ export default class AddEmplyeeModal extends Component {
     return null
   }
 
-  handleSave = e => {
+  handleSave = async e => {
     e.preventDefault()
     console.log(this.state.employee)
-    let employees = JSON.parse(localStorage.getItem('employees')) || []
     if (this.state.modal === 'add') {
-      employees.push(this.state.employee)
+      await axios.post('/api/employee', this.state.employee)
     } else {
       console.log(this.state.index)
-      employees[this.state.index] = this.state.employee
+      await axios.put(`/api/employee/${this.state.index}`, this.state.employee)
     }
-    localStorage.setItem('employees', JSON.stringify(employees))
-    console.log(employees)
+    let employees = await axios.get('/api/employee')
+    employees = employees.data
     this.props.submit(employees)
     this.closeBtn.click()
   }

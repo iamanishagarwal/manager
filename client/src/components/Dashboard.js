@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 
 export default class Dashboard extends Component {
   state = {
@@ -29,43 +30,35 @@ export default class Dashboard extends Component {
     return null
   }
 
-  componentDidMount = () => {
-    let employees = JSON.parse(localStorage.getItem('employees')) || []
+  componentDidMount = async () => {
+    let employees = await axios.get('/api/employee')
+    employees = employees.data
     let availableEmp = this.calculateAvailableEmp(employees)
     this.setState({ employees, availableEmp })
   }
 
-  handleCheckBox = i => {
-    console.log(i)
-    let results = this.state.employees
-    let emp = results[i]
-    let emp1 = JSON.parse(JSON.stringify(emp))
-    emp1.available = !emp.available
-    results[i] = emp1
-    localStorage.setItem('employees', JSON.stringify(results))
-    let availableEmp = this.calculateAvailableEmp(results)
-    this.setState({ employees: results, availableEmp })
-    console.log(availableEmp)
+  handleCheckBox = async emp => {
+    console.log(emp._id)
+    emp.available = !emp.available
+    await axios.put(`/api/employee/${emp._id}`, emp)
+    this.componentDidMount()
   }
 
-  handleDeleteBtn = index => {
-    let results = JSON.parse(JSON.stringify(this.state.employees))
-    results.splice(index, 1)
+  handleDeleteBtn = async id => {
+    let results = await axios.delete(`/api/employee/${id}`)
+    results = results.data
     console.log(results)
-    localStorage.setItem('employees', JSON.stringify(results))
-    let availableEmp = this.calculateAvailableEmp(results)
-    console.log(availableEmp)
-    this.setState({ employees: results, availableEmp })
+    this.componentDidMount()
   }
 
   renderEmployees = () => {
-    let results = JSON.parse(localStorage.getItem('employees')) || []
+    let results = this.state.employees
     console.log(results)
     if (results.length === 0) return null
     else {
-      results = results.map((emp, i) => {
+      results = results.map(emp => {
         return (
-          <tr key={i}>
+          <tr key={emp._id}>
             <td>{emp.name}</td>
             <td>{emp.department}</td>
             <td>
@@ -73,11 +66,11 @@ export default class Dashboard extends Component {
                 <input
                   type="checkbox"
                   className="custom-control-input"
-                  id={i}
+                  id={emp._id}
                   checked={emp.available}
-                  onChange={() => this.handleCheckBox(i)}
+                  onChange={e => this.handleCheckBox(emp)}
                 />
-                <label className="custom-control-label" htmlFor={i}></label>
+                <label className="custom-control-label" htmlFor={emp._id}></label>
               </div>
             </td>
             <td>
@@ -87,13 +80,20 @@ export default class Dashboard extends Component {
                 data-toggle="modal"
                 data-target="#addEmployeeModal"
                 onClick={() => {
-                  console.log(i)
-                  this.props.editBtnClick(emp, i)
+                  console.log(emp._id)
+                  this.props.editBtnClick(emp, emp._id)
                 }}
               >
                 <i className="fa fa-edit"></i>&nbsp; Edit
               </button>
-              <button type="button" className="btn btn-outline-danger btn-sm" onClick={() => this.handleDeleteBtn(i)}>
+              <button
+                type="button"
+                className="btn btn-outline-danger btn-sm"
+                onClick={e => {
+                  e.preventDefault()
+                  this.handleDeleteBtn(emp._id)
+                }}
+              >
                 <i className="fa fa-trash"></i>&nbsp; Delete
               </button>
             </td>

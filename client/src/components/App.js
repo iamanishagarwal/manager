@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import axios from 'axios'
 import Dashboard from './Dashboard'
 import AddEmployeeModal from './AddEmplyeeModal'
 
@@ -6,9 +7,8 @@ export default class App extends Component {
   constructor(props) {
     super(props)
 
-    let employees = JSON.parse(localStorage.getItem('employees')) || []
     this.state = {
-      employees: employees,
+      employees: [],
       editEmployee: {
         name: '',
         gender: '',
@@ -21,6 +21,13 @@ export default class App extends Component {
       modal: 'add',
       editEmployeeIndex: null
     }
+  }
+
+  componentDidMount = async () => {
+    let employees = await axios.get('/api/employee')
+    employees = employees.data
+    console.log(employees)
+    this.setState({ employees })
   }
 
   addModalSubmit = employees => {
