@@ -22,11 +22,9 @@ export default class AddEmplyeeModal extends Component {
 
   handleSave = async e => {
     e.preventDefault()
-    console.log(this.state.employee)
     if (this.state.modal === 'add') {
       await axios.post('/api/employee', this.state.employee)
     } else {
-      console.log(this.state.index)
       await axios.put(`/api/employee/${this.state.index}`, this.state.employee)
     }
     let employees = await axios.get('/api/employee')
@@ -93,7 +91,7 @@ export default class AddEmplyeeModal extends Component {
                         onChange={e => {
                           this.props.change('gender', e.target.value)
                         }}
-                        value={this.state.employee.value}
+                        value={this.state.employee.gender}
                       >
                         <option>Select</option>
                         <option>Male</option>
